@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Git 常用命令速查表</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'SF Mono', Monaco, 'Cascadia Code', monospace;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 40px 20px;
+            color: #2d3748;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #24292e 0%, #1a1e22 100%);
+            color: white;
+            padding: 30px 40px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 30px 40px;
+        }
+
+        .section {
+            margin-bottom: 40px;
+        }
+
+        .section-title {
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+            color: #2d3748;
+            display: inline-block;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            background: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        th {
+            background: #667eea;
+            color: white;
+            padding: 12px 15px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.95em;
+        }
+
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        tr:hover {
+            background: #f7fafc;
+        }
+
+        .command {
+            font-family: 'Courier New', monospace;
+            font-weight: 600;
+            color: #667eea;
+            font-size: 0.95em;
+        }
+
+        .desc {
+            color: #4a5568;
+            font-size: 0.9em;
+        }
+
+        .badge {
+            display: inline-block;
+            background: #48bb78;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.75em;
+            font-weight: 600;
+            margin-left: 8px;
+        }
+
+        .badge-warning {
+            background: #ed8936;
+        }
+
+        .note {
+            background: #fef5e7;
+            border-left: 4px solid #f39c12;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+
+        .note strong {
+            color: #e67e22;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .content {
+                padding: 20px;
+            }
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
+            th, td {
+                padding: 8px 10px;
+            }
+            .command {
+                font-size: 0.85em;
+            }
+        }
+
+        footer {
+            background: #f7fafc;
+            padding: 20px 40px;
+            text-align: center;
+            color: #718096;
+            border-top: 1px solid #e2e8f0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📘 Git 常用命令速查表</h1>
+            <p>Git Cheat Sheet - 日常开发必备命令</p>
+        </div>
+
+        <div class="content">
+            <!-- 初始化与配置 -->
+            <div class="section">
+                <h2 class="section-title">🔧 初始化与配置</h2>
+                <table>
+                    <thead>
+                        <tr><th>命令</th><th>说明</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td class="command">git init</td><td class="desc">初始化一个新的 Git 仓库</td></tr>
+                        <tr><td class="command">git clone &lt;url&gt;</td><td class="desc">克隆远程仓库到本地</td></tr>
+                        <tr><td class="command">git config --global user.name "name"</td><td class="desc">设置全局用户名</td></tr>
+                        <tr><td class="command">git config --global user.email "email"</td><td class="desc">设置全局邮箱</td></tr>
+                        <tr><td class="command">git config --list</td><td class="desc">查看所有 Git 配置</td></tr>
+                        <tr><td class="command">git config --global core.editor "code --wait"</td><td class="desc">设置默认编辑器为 VS Code</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 基础操作 -->
+            <div class="section">
+                <h2 class="section-title">📝 基础操作</h2>
+                <table>
+                    <thead><tr><th>命令</th><th>说明</th></tr></thead>
+                    <tbody>
+                        <tr><td class="command">git status</td><td class="desc">查看当前状态（哪些文件被修改）</td></tr>
+                        <tr><td class="command">git add &lt;file&gt;</td><td class="desc">添加指定文件到暂存区</td></tr>
+                        <tr><td class="command">git add .</td><td class="desc">添加所有修改的文件到暂存区</td></tr>
+                        <tr><td class="command">git add -A</td><td class="desc">添加所有文件（包括删除的文件）</td></tr>
+                        <tr><td class="command">git commit -m "message"</td><td class="desc">提交暂存区的修改</td></tr>
+                        <tr><td class="command">git commit -am "message"</td><td class="desc">跳过 add 直接提交（仅已跟踪文件）</td></tr>
+                        <tr><td class="command">git commit --amend</td><td class="desc">修改最后一次提交</td></tr>
+                        <tr><td class="command">git restore &lt;file&gt;</td><td class="desc">撤销工作区的修改</td></tr>
+                        <tr><td class="command">git restore --staged &lt;file&gt;</td><td class="desc">从暂存区移除文件</td></tr>
+                        <tr><td class="command">git rm &lt;file&gt;</td><td class="desc">删除文件并记录到暂存区</td></tr>
+                        <tr><td class="command">git mv &lt;old&gt; &lt;new&gt;</td><td class="desc">移动/重命名文件</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 查看历史 -->
+            <div class="section">
+                <h2 class="section-title">📜 查看历史</h2>
+                <table>
+                    <thead><tr><th>命令</th><th>说明</th></tr></thead>
+                    <tbody>
+                        <tr><td class="command">git log</td><td class="desc">查看提交历史</td></tr>
+                        <tr><td class="command">git log --oneline</td><td class="desc">一行显示简洁历史</td></tr>
+                        <tr><td class="command">git log --graph --oneline --decorate</td><td class="desc">图形化显示分支历史</td></tr>
+                        <tr><td class="command">git diff</td><td class="desc">查看工作区与暂存区的差异</td></tr>
+                        <tr><td class="command">git diff --staged</td><td class="desc">查看暂存区与上一次提交的差异</td></tr>
+                        <tr><td class="command">git show &lt;commit&gt;</td><td class="desc">查看某次提交的详细信息</td></tr>
+                        <tr><td class="command">git blame &lt;file&gt;</td><td class="desc">查看文件每行是谁修改的</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 分支管理 -->
+            <div class="section">
+                <h2 class="section-title">🌿 分支管理</h2>
+                <table>
+                    <thead><tr><th>命令</th><th>说明</th></tr></thead>
+                    <tbody>
+                        <tr><td class="command">git branch</td><td class="desc">查看本地分支（当前分支带 *）</td></tr>
+                        <tr><td class="command">git branch -r</td><td class="desc">查看远程分支</td></tr>
+                        <tr><td class="command">git branch -a</td><td class="desc">查看所有分支（本地+远程）</td></tr>
+                        <tr><td class="command">git branch &lt;name&gt;</td><td class="desc">创建新分支</td></tr>
+                        <tr><td class="command">git checkout &lt;name&gt;</td><td class="desc">切换分支</td></tr>
+                        <tr><td class="command">git switch &lt;name&gt;</td><td class="desc">切换分支（新命令）</td></tr>
+                        <tr><td class="command">git checkout -b &lt;name&gt;</td><td class="desc">创建并切换到新分支</td></tr>
+                        <tr><td class="command">git switch -c &lt;name&gt;</td><td class="desc">创建并切换到新分支（新命令）</td></tr>
+                        <tr><td class="command">git merge &lt;branch&gt;</td><td class="desc">合并指定分支到当前分支</td></tr>
+                        <tr><td class="command">git branch -d &lt;name&gt;</td><td class="desc">删除分支</td></tr>
+                        <tr><td class="command">git branch -D &lt;name&gt;</td><td class="desc">强制删除未合并的分支</td></tr>
+                        <tr><td class="command">git push origin --delete &lt;name&gt;</td><td class="desc">删除远程分支</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 远程仓库 -->
+            <div class="section">
+                <h2 class="section-title">🌍 远程仓库</h2>
+                <table>
+                    <thead><tr><th>命令</th><th>说明</th></tr></thead>
+                    <tbody>
+                        <tr><td class="command">git remote -v</td><td class="desc">查看远程仓库地址</td></tr>
+                        <tr><td class="command">git remote add origin &lt;url&gt;</td><td class="desc">添加远程仓库</td></tr>
+                        <tr><td class="command">git remote set-url origin &lt;url&gt;</td><td class="desc">修改远程仓库地址</td></tr>
+                        <tr><td class="command">git push origin &lt;branch&gt;</td><td class="desc">推送分支到远程</td></tr>
+                        <tr><td class="command">git push -u origin &lt;branch&gt;</td><td class="desc">推送并设置上游分支</td></tr>
+                        <tr><td class="command">git push --force</td><td class="desc">强制推送（⚠️ 谨慎使用）</td></tr>
+                        <tr><td class="command">git pull</td><td class="desc">拉取远程更新并合并</td></tr>
+                        <tr><td class="command">git fetch</td><td class="desc">拉取远程更新但不合并</td></tr>
+                        <tr><td class="command">git clone &lt;url&gt;</td><td class="desc">克隆远程仓库</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 撤销与回退 -->
+            <div class="section">
+                <h2 class="section-title">⏪ 撤销与回退</h2>
+                <table>
+                    <thead><tr><th>命令</th><th>说明</th></tr></thead>
+                    <tbody>
+                        <tr><td class="command">git reset HEAD &lt;file&gt;</td><td class="desc">从暂存区移除文件（等同于 restore --staged）</td></tr>
+                        <tr><td class="command">git reset --soft HEAD~1</td><td class="desc">撤销提交，保留修改</td></tr>
+                        <tr><td class="command">git reset --mixed HEAD~1</td><td class="desc">撤销提交和暂存，保留工作区</td></tr>
+                        <tr><td class="command">git reset --hard HEAD~1</td><td class="desc">撤销提交并删除所有修改（⚠️ 危险）</td></tr>
+                        <tr><td class="command">git revert &lt;commit&gt;</td><td class="desc">生成新提交来撤销指定提交</td></tr>
+                        <tr><td class="command">git stash</td><td class="desc">临时保存当前修改</td></tr>
+                        <tr><td class="command">git stash pop</td><td class="desc">恢复最近的暂存并删除记录</td></tr>
+                        <tr><td class="command">git stash list</td><td class="desc">查看所有暂存列表</td></tr>
+                        <tr><td class="command">git stash apply</td><td class="desc">恢复暂存但保留记录</td></tr>
+                        <tr><td class="command">git stash drop</td><td class="desc">删除暂存记录</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 实用技巧 -->
+            <div class="section">
+                <h2 class="section-title">💡 实用技巧</h2>
+                <div class="grid-2">
+                    <table>
+                        <thead><tr><th>命令</th><th>说明</th></tr></thead>
+                        <tbody>
+                            <tr><td class="command">git tag &lt;name&gt;</td><td class="desc">创建标签</td></tr>
+                            <tr><td class="command">git push origin --tags</td><td class="desc">推送标签到远程</td></tr>
+                            <tr><td class="command">git cherry-pick &lt;commit&gt;</td><td class="desc">将某次提交应用到当前分支</td></tr>
+                            <tr><td class="command">git rebase &lt;branch&gt;</td><td class="desc">变基操作（⚠️ 谨慎使用）</td></tr>
+                            <tr><td class="command">git reflog</td><td class="desc">查看所有操作历史（恢复误删）</td></tr>
+                        </tbody>
+                    </table>
+                    <table>
+                        <thead><tr><th>命令</th><th>说明</th></tr></thead>
+                        <tbody>
+                            <tr><td class="command">git grep "text"</td><td class="desc">在代码中搜索文本</td></tr>
+                            <tr><td class="command">git shortlog -sn</td><td class="desc">统计每个人的提交数</td></tr>
+                            <tr><td class="command">git ls-files</td><td class="desc">列出被追踪的文件</td></tr>
+                            <tr><td class="command">git archive --format=zip HEAD</td><td class="desc">导出当前代码为 ZIP</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 常见问题 -->
+            <div class="section">
+                <h2 class="section-title">❓ 常见问题</h2>
+                <table>
+                    <thead><tr><th>问题</th><th>解决方案</th></tr></thead>
+                    <tbody>
+                        <tr><td class="command">fatal: not a git repository</td><td class="desc">未在 Git 仓库目录中，执行 <code>git init</code> 或进入正确目录</td></tr>
+                        <tr><td class="command">failed to connect to github.com</td><td class="desc">网络问题，尝试配置代理或使用 SSH 协议</td></tr>
+                        <tr><td class="command">Please tell me who you are</td><td class="desc">未配置用户信息，执行 <code>git config --global user.name/email</code></td></tr>
+                        <tr><td class="command">conflict (content)</td><td class="desc">合并冲突，手动解决冲突后 <code>git add</code> 再提交</td></tr>
+                        <tr><td class="command">rejected (non-fast-forward)</td><td class="desc">远程有更新，先 <code>git pull</code> 再 <code>git push</code></td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <footer>
+            <p>💡 提示：使用 <code>git help &lt;command&gt;</code> 或 <code>git &lt;command&gt; --help</code> 查看详细帮助文档</p>
+            <p style="margin-top: 10px; font-size: 0.85em;">⭐ 常用操作：<code>git add .</code> → <code>git commit -m "message"</code> → <code>git push</code></p>
+        </footer>
+    </div>
+</body>
+</html>
