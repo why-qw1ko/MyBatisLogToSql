@@ -1,6 +1,11 @@
 # MyBatisLogToSql
-> mybatis的日志转正常可用sql的工具
-> 支持--开头，中文结尾的注释
+> **mybatis的日志转正常可用sql的小工具**
+>
+> 支持`--`开头，`中文`结尾的注释
+>
+> 业务复杂的sql我测的也没问题，有问题可以直接提issue
+>
+> 直接使用`MyBatisLogToSql.html`即可，如果觉得好用，欢迎给个star
 ------
 例如输入
 ```sql

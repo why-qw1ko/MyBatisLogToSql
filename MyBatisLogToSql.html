@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MyBatis SQL Pro - 还原工具</title>
+    <script src="https://cdn.jsdelivr.net/npm/sql-formatter@15.3.1/dist/sql-formatter.min.js"></script>
+    <style>
+        :root {
+            --primary: #1890ff;
+            --success: #52c41a;
+            --bg: #f0f2f5;
+            --card-bg: #ffffff;
+            --text-main: #262626;
+            --text-sec: #8c8c8c;
+            --border: #d9d9d9;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--bg);
+            color: var(--text-main);
+            margin: 0;
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1100px;
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+            padding: 32px;
+            box-sizing: border-box;
+        }
+
+        .header { text-align: center; margin-bottom: 30px; }
+        .header h1 { margin: 0; font-size: 24px; color: var(--primary); letter-spacing: 1px; }
+        .header p { color: var(--text-sec); margin-top: 8px; font-size: 14px; }
+
+        .section-label {
+            font-weight: 600;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-label::before {
+            content: '';
+            display: inline-block;
+            width: 4px;
+            height: 16px;
+            background: var(--primary);
+            border-radius: 2px;
+        }
+
+        textarea {
+            width: 100%;
+            height: 220px;
+            padding: 16px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-family: 'Cascadia Code', 'Consolas', monospace;
+            font-size: 13px;
+            line-height: 1.6;
+            transition: all 0.3s;
+            box-sizing: border-box;
+            background: #fafafa;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.1);
+            background: #fff;
+        }
+
+        .toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 20px 0;
+            padding: 16px;
+            background: #f9f9f9;
+            border-radius: 8px;
+            border: 1px dashed var(--border);
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .config-group { display: flex; align-items: center; gap: 15px; }
+
+        select {
+            padding: 6px 10px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            font-size: 13px;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .btn-group { display: flex; gap: 12px; }
+
+        .btn {
+            padding: 8px 20px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: #40a9ff; transform: translateY(-1px); }
+
+        .btn-format { background: #722ed1; color: white; }
+        .btn-format:hover { background: #9254de; transform: translateY(-1px); }
+
+        .btn-copy { background: var(--success); color: white; }
+        .btn-copy:hover { background: #73d13d; transform: translateY(-1px); }
+
+        .btn-clear { background: #f5f5f5; color: #595959; border: 1px solid var(--border); }
+        .btn-clear:hover { background: #e8e8e8; }
+
+        .checkbox-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            user-select: none;
+            cursor: pointer;
+        }
+
+        #toast {
+            position: fixed; top: 30px; left: 50%; transform: translateX(-50%) translateY(-100px);
+            background: #333; color: #fff; padding: 12px 24px; border-radius: 50px;
+            font-size: 14px; transition: all 0.4s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+            z-index: 9999; box-shadow: 0 4px 12px rgba(0,0,0,0.15); opacity: 0;
+        }
+
+        #toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+    </style>
+</head>
+<body>
+
+<div id="toast">提示信息</div>
+
+<div class="container">
+    <div class="header">
+        <h1>MyBatis SQL Pro</h1>
+        <p>支持深度参数解析 · 智能注释清洗 · 一键格式化</p>
+    </div>
+
+    <div class="section-label">粘贴 MyBatis 原始日志</div>
+    <textarea id="inputLog" placeholder="此处粘贴日志，支持多段 Preparing/Parameters..."></textarea>
+
+    <div class="toolbar">
+        <div class="config-group">
+            <label class="checkbox-wrapper">
+                <input type="checkbox" id="cleanComment" checked>
+                智能清洗干扰注释
+            </label>
+            <select id="algoSelect">
+                <option value="fsm">算法：污染回滚状态机 (推荐)</option>
+                <option value="anchor">算法：边界锚点检测</option>
+                <option value="regex">算法：特征正则清洗</option>
+            </select>
+        </div>
+        <div class="btn-group">
+            <button class="btn btn-clear" onclick="clearAll()">清空</button>
+            <button class="btn btn-primary" onclick="handleConvert()">✨ 解析并填充</button>
+            <button class="btn btn-format" onclick="handleFormat()">格式化 SQL</button>
+        </div>
+    </div>
+
+    <div class="section-label">最终可执行 SQL</div>
+    <textarea id="outputSql" readonly placeholder="待解析结果..."></textarea>
+    
+    <div style="margin-top: 15px; display: flex; justify-content: flex-end;">
+        <button class="btn btn-copy" onclick="copyResult()">📋 复制到剪贴板</button>
+    </div>
+</div>
+
+<script>
+    /* ---------------- 核心逻辑 ---------------- */
+
+    function handleConvert() {
+        const raw = document.getElementById('inputLog').value;
+        if (!raw.trim()) return showToast("请先输入日志内容");
+
+        const shouldClean = document.getElementById('cleanComment').checked;
+        const algo = document.getElementById('algoSelect').value;
+
+        // 提取块
+        const blocks = [];
+        const prepMatches = [...raw.matchAll(/Preparing:\s*/g)];
+        const paramMatches = [...raw.matchAll(/Parameters:\s*/g)];
+
+        prepMatches.forEach((m, idx) => {
+            const start = m.index + m[0].length;
+            const nextParam = paramMatches.find(pm => pm.index > m.index);
+            if (nextParam) {
+                const sqlEnd = nextParam.index;
+                const pStart = nextParam.index + nextParam[0].length;
+                let pEnd = raw.indexOf('\n', pStart);
+                if (pEnd === -1) pEnd = raw.length;
+
+                blocks.push({
+                    sql: raw.substring(start, sqlEnd),
+                    params: raw.substring(pStart, pEnd)
+                });
+            }
+        });
+
+        if (blocks.length === 0) return showToast("未发现有效的 MyBatis 日志标记");
+
+        const results = blocks.map(b => {
+            // 剥离日志前缀（时间戳、线程名等）
+            let sql = b.sql.split('\n').map(line => {
+                const marker = "==> ";
+                const i = line.indexOf(marker);
+                return i !== -1 ? line.substring(i + marker.length) : line;
+            }).join(' ').replace(/\s+/g, ' ').trim();
+
+            if (shouldClean) {
+                if (algo === 'fsm') sql = algoFSM(sql);
+                else if (algo === 'anchor') sql = algoAnchor(sql);
+                else sql = algoRegex(sql);
+            }
+
+            const pArray = parseParamsCorrected(b.params);
+            return safeFillSql(sql, pArray);
+        });
+
+        document.getElementById('outputSql').value = results.join('\n\n');
+        showToast("解析成功！");
+    }
+
+    /**
+     * 关键修复：参数解析逻辑 (非贪婪匹配)
+     * 解决 Value(Type), Value(Type) 中 Value 包含逗号或空格的问题
+     */
+    function parseParamsCorrected(pStr) {
+        if (!pStr || pStr.trim() === 'null') return [];
+        const params = [];
+        // (非贪婪内容)\((类型关键字)\)(?:逗号空格分隔 或 结尾)
+        const reg = /(.*?)\(([\w.\[\]]+)\)(?:,\s*|$)/g;
+        let match;
+        while ((match = reg.exec(pStr)) !== null) {
+            params.push({ val: match[1].trim(), type: match[2].toLowerCase() });
+        }
+        return params;
+    }
+
+    /**
+     * 参数填充逻辑
+     */
+    function safeFillSql(sql, params) {
+        let result = '';
+        let pIdx = 0;
+        let inStr = false, qChar = '', esc = false;
+
+        for (let i = 0; i < sql.length; i++) {
+            const char = sql[i];
+            if (!inStr) {
+                if (char === "'" || char === '"' || char === '`') {
+                    inStr = true; qChar = char; result += char;
+                } else if (char === '?' && pIdx < params.length) {
+                    result += formatSqlValue(params[pIdx++]);
+                } else {
+                    result += char;
+                }
+            } else {
+                result += char;
+                if (esc) { esc = false; }
+                else if (char === '\\') { esc = true; }
+                else if (char === qChar) {
+                    if (sql[i+1] === qChar) { result += qChar; i++; } 
+                    else { inStr = false; }
+                }
+            }
+        }
+        return result.trim().replace(/;*$/, ';');
+    }
+
+    function formatSqlValue(p) {
+        const val = p.val;
+        if (val === "null") return "NULL";
+        
+        const noQuoteTypes = ['number', 'integer', 'int', 'long', 'double', 'float', 'decimal', 'bigdecimal', 'boolean', 'short', 'byte'];
+        if (noQuoteTypes.some(t => p.type.includes(t))) {
+            if (p.type.includes('boolean')) return val === 'true' ? '1' : '0';
+            return val;
+        }
+        return `'${val.replace(/'/g, "''")}'`;
+    }
+
+    /* ---------------- 三种清洗算法 ---------------- */
+
+    function algoFSM(sql) {
+        const SQL_ZONE = 0, DIRT = 1, TENTATIVE = 2, STRING = 3;
+        let state = SQL_ZONE, out = '', tent = '', q = '', esc = false;
+        for (let i = 0; i < sql.length; i++) {
+            const c = sql[i], n = sql[i+1];
+            if (state === STRING) {
+                out += c; if (esc) esc = false; else if (c === '\\') esc = true; else if (c === q) state = SQL_ZONE;
+                continue;
+            }
+            if (state === SQL_ZONE) {
+                if (c==="'" || c==='"' || c==='`') { state=STRING; q=c; out+=c; }
+                else if (c==='-' && n==='-') { state=DIRT; i++; }
+                else out += c;
+            } else if (state === DIRT) {
+                if (c.charCodeAt(0) <= 126 && !/^[=\-#*]{3,}/.test(sql.substring(i, i+3))) { state=TENTATIVE; tent=c; }
+            } else if (state === TENTATIVE) {
+                if (c.charCodeAt(0) > 126) { state=DIRT; tent=''; }
+                else if (c==='-' && n==='-') { out += " " + tent; tent=''; state=DIRT; i++; }
+                else tent += c;
+            }
+        }
+        return out + tent;
+    }
+
+    function algoAnchor(sql) {
+        const SAFE = /[a-zA-Z0-9\s_,\.\(\)\*\+=\-<>!'";\?\/\[\]:%#`@$]/;
+        if (!sql.includes('--')) return sql;
+        let frags = sql.split('--'), res = frags[0];
+        for(let i=1; i<frags.length; i++) {
+            let lastG = -1; for(let j=0; j<frags[i].length; j++) if (!SAFE.test(frags[i][j])) lastG = j;
+            res += " " + frags[i].substring(lastG + 1);
+        }
+        return res;
+    }
+
+    function algoRegex(sql) { 
+        return sql.replace(/--\s*[^\x00-\xff]+[^\x00-\x7e]*/g, ' '); 
+    }
+
+    /* ---------------- 辅助功能 ---------------- */
+
+    function handleFormat() {
+        const sql = document.getElementById('outputSql').value;
+        if (!sql) return showToast("请先解析生成 SQL");
+        try {
+            document.getElementById('outputSql').value = sqlFormatter.format(sql, {
+                language: "sql",
+                uppercase: true
+            });
+            showToast("格式化完成");
+        } catch (e) { showToast("格式化失败"); }
+    }
+
+    function showToast(msg) {
+        const t = document.getElementById('toast');
+        t.innerText = msg; t.classList.add('show');
+        setTimeout(() => t.classList.remove('show'), 2000);
+    }
+
+    function clearAll() {
+        document.getElementById('inputLog').value = "";
+        document.getElementById('outputSql').value = "";
+        showToast("已清空");
+    }
+
+    function copyResult() {
+        const area = document.getElementById('outputSql');
+        if (!area.value) return;
+        area.select();
+        document.execCommand('copy');
+        showToast("已成功复制");
+    }
+</script>
+</body>
+</html>
